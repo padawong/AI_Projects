@@ -35,7 +35,7 @@ Node* general_search(std::vector< std::vector<int> > &problem, std::string queue
             return nullptr;
         }
 
-        Node* current = queue.front();
+        Node* current = queue.top();
         queue.pop();
 
         // Goal state found
@@ -62,17 +62,13 @@ Node* general_search(std::vector< std::vector<int> > &problem, std::string queue
         // Expand current node and update queue and lists
         std::cout << "Currently expanding: " << std::endl;
         print_grid(current->grid);
+        // std::cout << "Open list: "  << open_list.size() << std::endl;
+        // std::cout << "Closed list: "  << closed_list.size() << std::endl;
         std::cout << "====================" << std::endl;
         expanded++;
-        if (queueing_function == "Uniform Cost") {
-            update_uniform_cost_queue(current, queue, open_list, closed_list);
-        }
-        else if (queueing_function == "Misplaced Tile") {
-            update_misplaced_tile_queue(current, queue, open_list, closed_list);
-        }
-        else { // Manhattan Distance 
-            update_manhattan_distance_queue(current, queue, open_list, closed_list);
-        }
+        update_queue(current, queue, open_list, closed_list, queueing_function);
+
+        // Update max queue size
         if (queue.size() > queue_max) {
             queue_max = queue.size();
         }
@@ -85,7 +81,7 @@ Node* general_search(std::vector< std::vector<int> > &problem, std::string queue
  * Performs all expansion and enqueueing for the node currently being examined
  * Checks to see if the grid configuration has been seen before or is currently in queue; if so, does not add
  */
-void update_uniform_cost_queue(Node* node, std::queue<Node*> &queue, std::vector<Node*> &open_list, std::vector<Node*> &closed_list) {
+void update_queue(Node* node, std::priority_queue<Node*> &queue, std::vector<Node*> &open_list, std::vector<Node*> &closed_list, std::string queueing_function) {
     int open_pos, closed_pos;
     std::vector<Node*> moves;
     Node* curr_node;
@@ -109,7 +105,8 @@ void update_uniform_cost_queue(Node* node, std::queue<Node*> &queue, std::vector
             if (open_pos == -1 && closed_pos == -1) {
                 std::vector<std::vector<int> > curr_grid = curr_node->grid;
                 if (queueing_function == "Uniform Cost") {
-                    queue.push(curr_node);
+                    // DO NOTHING
+                    // queue.push(curr_node);
                 }
                 else if (queueing_function == "Misplaced Tile") {
                     // Checks all entries to count misplaced tiles
@@ -127,48 +124,12 @@ void update_uniform_cost_queue(Node* node, std::queue<Node*> &queue, std::vector
                         curr_node->heuristic++;
                     }
 
-                    // Enqueue based on heuristic
-
                 }
                 else { // Manhattan Distance
 
                 }
-                //print_grid(curr_node->grid);
-                open_list.push_back(curr_node);
-            }
-        }
-    }
-}
-
-/* A* MISPLACED TILE QUEUEING FUNCTION
- * Performs all expansion and enqueueing for the node currently being examined
- * Checks to see if the grid configuration has been seen before or is currently in queue; if so, does not add
- * Calculates and stores misplaced tile heuristic
- */
-void update_uniform_cost_queue(Node* node, std::queue<Node*> &queue, std::vector<Node*> &open_list, std::vector<Node*> &closed_list) {
-    int open_pos, closed_pos;
-    std::vector<Node*> moves;
-    Node* curr_node;
-
-    std::pair<int, int> zero_loc = find_zero(node->grid);
-    moves.push_back(move_right(node, zero_loc));
-    moves.push_back(move_left(node, zero_loc));
-    moves.push_back(move_up(node, zero_loc));
-    moves.push_back(move_down(node, zero_loc));
-
-    for (int i = 0; i < moves.size(); i++) {
-        curr_node = moves.at(i);
-
-        // Valid move
-        if (curr_node != nullptr) {
-            open_pos = node_at(curr_node, open_list);
-            closed_pos = node_at(curr_node, closed_list);
-
-            // No match found in either list
-            // Push onto queue and add to open_list
-            if (open_pos == -1 && closed_pos == -1) {
+                // Enqueue (will automatically adjust for heuristics)
                 queue.push(curr_node);
-                //print_grid(curr_node->grid);
 
                 open_list.push_back(curr_node);
             }
