@@ -9,6 +9,8 @@ struct Node {
     Node();
     Node(std::vector<std::vector<int> > &grid_in);
 
+    int dimension;
+    int puzzle_size;
     int heuristic;
     int depth;
 
@@ -18,7 +20,7 @@ struct Node {
         return heuristic > rhs.heuristic;
     }
     friend bool operator<(const Node& lhs, const Node& rhs) {
-        return lhs.heuristic > rhs.heuristic;
+        return (lhs.depth + lhs.heuristic) > (rhs.depth + rhs.heuristic);
     }
     //bool operator==(const Node& rhs); 
     //bool operator()(const Node& rhs);

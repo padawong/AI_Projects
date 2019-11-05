@@ -10,7 +10,7 @@
 struct Node;
 
 Node* move_right(Node* node, std::pair<int, int> coord) {
-    if (coord.second == 2) {
+    if (coord.second == node->dimension - 1) {
         return nullptr;
     }
 
@@ -33,7 +33,7 @@ Node* move_left(Node* node, std::pair<int, int> coord) {
 }
 
 Node* move_down(Node* node, std::pair<int, int> coord) {
-    if (coord.first == 2) {
+    if (coord.first == node->dimension - 1) {
         return nullptr;
     }
 

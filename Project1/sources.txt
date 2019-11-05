@@ -4,3 +4,9 @@ Operator overloading: https://stackoverflow.com/questions/1691007/whats-the-righ
 Referenced this site for expected generation values/depth/etc. of input: http://tristanpenman.com/demos/n-puzzle/
 
 Priority queue - overloading operator: https://stackoverflow.com/questions/9178083/priority-queue-for-user-defined-types/19123561
+    https://stackoverflow.com/questions/9178083/priority-queue-for-user-defined-types/19123561
+    http://www.cplusplus.com/reference/queue/priority_queue/
+    https://www.daniweb.com/programming/software-development/threads/385654/c-overloading-operator-not-working-properly-noob-ish
+    https://stackoverflow.com/questions/13790276/operator-overload-or-comparison-function-in-c-priority-queue
+    https://stackoverflow.com/questions/35259277/getting-an-error-of-the-form-operator-must-take-exactly-one-argument-when-ov
+    https://stackoverflow.com/questions/44974836/priority-queue-top-segmentation-fault

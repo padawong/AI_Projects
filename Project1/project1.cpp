@@ -66,8 +66,9 @@ Node general_search(std::vector< std::vector<int> > &problem, std::string queuei
         }
 
         // Expand current node and update queue and lists
-        std::cout << "Currently expanding: " << std::endl;
+        std::cout << "The best state to expand with a g(n) = " << current->depth << " and h(n) = " << current->heuristic << " is: " << std::endl;
         print_grid(current->grid);
+        std::cout << "Expanding this node..." << std::endl;
         // std::cout << "Open list: "  << open_list.size() << std::endl;
         // std::cout << "Closed list: "  << closed_list.size() << std::endl;
         std::cout << "====================" << std::endl;
@@ -112,7 +113,8 @@ void update_queue(Node* node, std::priority_queue<Node> &queue, std::vector<Node
             if (open_pos == -1 && closed_pos == -1) {
                 std::vector<std::vector<int> > curr_grid = curr_node->grid;
                 if (queueing_function == "Uniform Cost") {
-                    curr_node->heuristic = curr_node->depth;
+                    // DO NOTHING
+                    // No heuristic to update
                 }
                 else if (queueing_function == "Misplaced Tile") {
                     // Checks all entries to count misplaced tiles
@@ -127,25 +129,44 @@ void update_queue(Node* node, std::priority_queue<Node> &queue, std::vector<Node
                             correct_val++;
                         }
                     }
-                    if (moves.at(0) != nullptr) {
-                        std::cout << "curr_node->heuristic = " << curr_node->heuristic << std::endl;
-                        std::cout << "moves.at(0)->heuristic = " << moves.at(0)->heuristic << std::endl;
-
-                        if (*curr_node < *moves.at(0)) {
-                            std::cout << "curr_node < moves.at(0)" << std::endl;
-                            print_grid(curr_node->grid);
-                            print_grid(moves.at(0)->grid);
-                        }
-                        else {
-                            std::cout << "curr_node > moves.at(0)" << std::endl;
-                            print_grid(curr_node->grid);
-                            print_grid(moves.at(0)->grid);
-                        
-                        }
-                    }
                 }
                 else { // Manhattan Distance
-
+                    // Checks all entries to sum Manhattan distance of all tiles
+                    // Loop checks all but the final entry
+                    // Manhattan distance = abs(x_expected - x_actual) + abs(y_expected - y_actual)
+                    int x_expected, y_expected;
+                    int correct_val = 1;
+                    int distance;
+                    
+                    // From 1 -> puzzle_size, search for each correct value
+                    // When found, calculate Manhattan distance
+                    for (int n = 0; n < curr_node->puzzle_size; n++) {
+                        for (int x = 0; x < curr_grid.size(); x++) {
+                            for (int y = 0; y < curr_grid.size(); y++) {
+                                if (curr_grid.at(x).at(y) == correct_val) {
+                                    x_expected = (correct_val - 1) / curr_grid.size();
+                                    y_expected = (correct_val - 1) % curr_grid.size();
+                                    distance = abs(x_expected - x) + abs(y_expected - y);
+                                    curr_node->heuristic += distance;
+                                    
+                                    /*
+                                    std::cout << "Current val = " << correct_val << std::endl;
+                                    std::cout << "x_exp = " << x_expected << "; y_exp = " << y_expected << std::endl;
+                                    std::cout << "x = " << x << "; y = " << y << std::endl;
+                                    std::cout << "Distance = " << distance << std::endl;
+                                    std::cout << "curr_node->heuristic = " << curr_node->heuristic << std::endl;
+                                    print_grid(curr_grid);
+                                    */
+                                    
+                                    // Restart search of entire grid
+                                    distance = 0;
+                                    correct_val++;
+                                    x = curr_grid.size();
+                                    break;
+                                }
+                            }
+                        }
+                    }
                 }
                 // Enqueue (will automatically adjust for heuristics)
                 Node temp = *curr_node;

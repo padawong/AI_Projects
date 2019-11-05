@@ -5,12 +5,17 @@ Node::Node() {
 
 Node::Node(std::vector<std::vector<int> > &grid_in) {
     this->grid = grid_in;
+    dimension = grid_in.size();
+    puzzle_size = dimension*dimension - 1;
     heuristic = 0;
     depth = 0;
 }
 
 void Node::set_grid(std::vector<std::vector<int> > &grid_in) {
     this->grid = grid_in;
+    dimension = grid_in.size();
+    puzzle_size = dimension*dimension - 1;
+    heuristic = 0;
     depth = 0;
 }
 /*
