@@ -13,17 +13,8 @@ int main () {
 
     std::pair<int, int> coord;
 
-    //print_grid(grid);
-    Node* final_grid = uniform_cost(grid);
+    Node* final_grid = general_search(grid, "Misplaced Tile");
     print_grid(final_grid->grid);
-    //coord = find_zero(grid);
-    
-    // std::cout << "Please entered desired dimensions: " << std::endl;
-    // std::getline(std::cin, dim_in);
-    // dimensions = stoi(dim_in);
-
-    // grid = generate_grid(dimensions);
-
 
     return 0;
 }

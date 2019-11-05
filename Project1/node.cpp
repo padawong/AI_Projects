@@ -22,3 +22,11 @@ bool Node::operator==(const Node& rhs) {
         return false;
     }
 }
+
+bool Node::operator<(const Node& rhs) {
+    return heuristic > rhs.heuristic;
+}
+
+void Node::set_depth(int d) {
+    this->depth = d;
+}

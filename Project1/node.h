@@ -8,12 +8,15 @@ class Node {
     public:
         Node();
         Node(std::vector<std::vector<int> > &grid_in);
-        void set_grid(std::vector<std::vector<int> > &grid_in);
-        bool operator==(const Node& rhs);
-        std::vector<std::vector<int> > grid;
+
         int heuristic;
         int depth;
-};
 
+        void set_grid(std::vector<std::vector<int> > &grid_in);
+        bool operator==(const Node& rhs);
+        bool operator<(const Node& rhs);
+        std::vector<std::vector<int> > grid;
+        void set_depth(int d);
+};
 
 #endif //NODE_H
