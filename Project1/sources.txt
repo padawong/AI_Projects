@@ -1,0 +1,2 @@
+Operator overloading: https://stackoverflow.com/questions/1691007/whats-the-right-way-to-overload-operator-for-a-class-hierarchy
+    https://stackoverflow.com/questions/32685139/bool-must-take-exactly-one-argument-operator-implementation-file

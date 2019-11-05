@@ -1,37 +1,44 @@
-#include "project1.h"
+#include "operators.h"
 
-bool move_right(std::vector<std::vector<int> > &grid, std::pair<int, int> coord) {
+class Node;
+
+Node* move_right(Node* node, std::pair<int, int> coord) {
     if (coord.second == 2) {
-        return false;
+        return nullptr;
     }
 
-    std::swap(grid.at(coord.first).at(coord.second), grid.at(coord.first).at(coord.second + 1));
-    return true;
+    Node* new_node = new Node(node->grid);
+    std::swap(new_node->grid.at(coord.first).at(coord.second), new_node->grid.at(coord.first).at(coord.second + 1));
+
+    return new_node;
 }
 
-bool move_left(std::vector<std::vector<int> > &grid, std::pair<int, int> coord) {
+Node* move_left(Node* node, std::pair<int, int> coord) {
     if (coord.second == 0) {
-        return false;
+        return nullptr;
     }
 
-    std::swap(grid.at(coord.first).at(coord.second), grid.at(coord.first).at(coord.second - 1));
-    return true;
+    Node* new_node = new Node(node->grid);
+    std::swap(new_node->grid.at(coord.first).at(coord.second), new_node->grid.at(coord.first).at(coord.second - 1));
+    return new_node;
 }
 
-bool move_down(std::vector<std::vector<int> > &grid, std::pair<int, int> coord) {
+Node* move_down(Node* node, std::pair<int, int> coord) {
     if (coord.first == 2) {
-        return false;
+        return nullptr;
     }
 
-    std::swap(grid.at(coord.first).at(coord.second), grid.at(coord.first + 1).at(coord.second));
-    return true;
+    Node* new_node = new Node(node->grid);
+    std::swap(new_node->grid.at(coord.first).at(coord.second), new_node->grid.at(coord.first + 1).at(coord.second));
+    return new_node;
 }
 
-bool move_up(std::vector<std::vector<int> > &grid, std::pair<int, int> coord) {
+Node* move_up(Node* node, std::pair<int, int> coord) {
     if (coord.first == 0) {
-        return false;
+        return nullptr;
     }
 
-    std::swap(grid.at(coord.first).at(coord.second), grid.at(coord.first - 1).at(coord.second));
-    return true;
+    Node* new_node = new Node(node->grid);
+    std::swap(new_node->grid.at(coord.first).at(coord.second), new_node->grid.at(coord.first - 1).at(coord.second));
+    return new_node;
 }

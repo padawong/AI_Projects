@@ -1,3 +1,4 @@
+#pragma once
 #ifndef PROJECT1_H
 #define PROJECT1_H
 
@@ -7,14 +8,17 @@
 #include <cstdlib>
 #include <ctime>
 #include <utility>
+#include <queue>
+#include <list>
+#include <algorithm>
+#include "node.h"
+#include "operators.h"
 
-void uniform_cost(std::vector< std::vector<int> > grid);
-void print_grid(std::vector< std::vector<int> > grid);
+Node* uniform_cost(std::vector< std::vector<int> > &grid);
+void const print_grid(std::vector< std::vector<int> > &grid);
 std::vector< std::vector<int> > generate_grid(int dimensions);
 std::pair<int, int> const find_zero(std::vector<std::vector<int> > &grid);
-bool move_right(std::vector<std::vector<int> > &grid, std::pair<int, int> coord);
-bool move_left(std::vector<std::vector<int> > &grid, std::pair<int, int> coord);
-bool move_down(std::vector<std::vector<int> > &grid, std::pair<int, int> coord);
-bool move_up(std::vector<std::vector<int> > &grid, std::pair<int, int> coord);
+void update_queue(Node* node, std::queue<Node*> &queue, std::vector<Node*> &open_list, std::vector<Node*> &closed_list);
+int node_at(Node* node, std::vector<Node*> &list_in);
 
 #endif // PROJECT1_H
