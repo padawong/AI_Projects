@@ -16,7 +16,7 @@ int main () {
 
     std::pair<int, int> coord;
 
-    //Node* final_grid = general_search(grid, "Uniform Cost");
+    //Node final_grid = general_search(grid, "Uniform Cost");
     Node final_grid = general_search(grid, "Misplaced Tile");
     print_grid(final_grid.grid);
 

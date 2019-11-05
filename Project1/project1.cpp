@@ -112,8 +112,7 @@ void update_queue(Node* node, std::priority_queue<Node> &queue, std::vector<Node
             if (open_pos == -1 && closed_pos == -1) {
                 std::vector<std::vector<int> > curr_grid = curr_node->grid;
                 if (queueing_function == "Uniform Cost") {
-                    // DO NOTHING
-                    // queue.push(curr_node);
+                    curr_node->heuristic = curr_node->depth;
                 }
                 else if (queueing_function == "Misplaced Tile") {
                     // Checks all entries to count misplaced tiles
