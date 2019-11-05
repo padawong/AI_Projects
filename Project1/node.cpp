@@ -14,8 +14,8 @@ void Node::set_grid(std::vector<std::vector<int> > &grid_in) {
     depth = 0;
 }
 
-bool Node::operator==(const Node& rhs) {
-    if (grid == rhs.grid) {
+bool Node::operator==(const Node* rhs) {
+    if (grid == rhs->grid) {
         return true;
     }
     else {
@@ -23,7 +23,8 @@ bool Node::operator==(const Node& rhs) {
     }
 }
 
-bool Node::operator<(const Node& rhs) {
+//bool Node::operator<(const Node* rhs) {
+bool Node::operator()(const Node& rhs) {
     return heuristic > rhs.heuristic;
 }
 

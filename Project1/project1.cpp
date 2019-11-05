@@ -111,19 +111,29 @@ void update_queue(Node* node, std::priority_queue<Node*> &queue, std::vector<Nod
                 else if (queueing_function == "Misplaced Tile") {
                     // Checks all entries to count misplaced tiles
                     // Loop checks all but the final entry
-                    for (int x = 1; x <= curr_grid.size(); x++) {
-                        for (int y = 0; y < curr_grid.size() - 1; y++) {
-                            // If value (other than max value) is not in the right place, increment heuristic
-                            if (curr_grid.at(x).at(y) != x + y) {
+                    int correct_val = 1;
+                    for (int x = 0; x < curr_grid.size(); x++) {
+                        for (int y = 0; y < curr_grid.size(); y++) {
+                            // If value (other than correct empty slot) is not in the right place, increment heuristic
+                            if (!(x == curr_grid.size() - 1 && y == curr_grid.size() - 1) && curr_grid.at(x).at(y) != correct_val) {
                                 curr_node->heuristic++;
                             }
+                            correct_val++;
                         }
                     }
-                    // Check final entry for 0
-                    if (curr_grid.at(curr_grid.size() - 1).at(curr_grid.size() - 1) != 0) {
-                        curr_node->heuristic++;
-                    }
+                    std::cout << "curr_node->heuristic = " << curr_node->heuristic << std::endl;
+                    std::cout << "moves.at(0)->heuristic = " << moves.at(0)->heuristic << std::endl;
 
+                    if (curr_node < moves.at(0)) {
+                        std::cout << "curr_node < moves.at(0)" << std::endl;
+                        print_grid(curr_node->grid);
+                        print_grid(moves.at(0)->grid);
+                    }
+                    else {
+                        std::cout << "curr_node > moves.at(0)" << std::endl;
+                        print_grid(curr_node->grid);
+                        print_grid(moves.at(0)->grid);
+                    }
                 }
                 else { // Manhattan Distance
 
