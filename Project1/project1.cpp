@@ -14,10 +14,11 @@
  *
  * Will need to create a node class to hold heuristic value
  */
-Node* general_search(std::vector< std::vector<int> > &problem, std::string queueing_function) {
+Node general_search(std::vector< std::vector<int> > &problem, std::string queueing_function) {
     std::pair<int, int> coord;
     std::vector< std::vector<int> > goal_state = {{1,2,3},{4,5,6},{7,8,0}};
-    std::priority_queue<Node*> queue;
+//    std::priority_queue<Node*, std::vector<Node*>, std::greater<Node>> queue;
+    std::priority_queue<Node> queue;
     std::vector<Node*> open_list;
     std::vector<Node*> closed_list;
     int expanded = 0;
@@ -26,17 +27,22 @@ Node* general_search(std::vector< std::vector<int> > &problem, std::string queue
     // Populate initial queue
     // Each node is a state of the puzzle
     Node* initial_state = new Node(problem);
-    queue.push(initial_state);
+    queue.push(*initial_state);
     open_list.push_back(initial_state);
 
     while(true) {
         // If queue is empty, return failure
-        if (queue.empty()) {
-            return nullptr;
+        if (queue.size() == 0) {
+            std::cout << "FAILURE!" << std::endl;
+            std::vector<std::vector<int> > failure = {{0,0,0}, {0,0,0}, {0,0,0}};
+            Node failed(failure);
+            return failed;
         }
-
-        Node* current = queue.top();
+        Node curr = queue.top();
         queue.pop();
+
+        Node* current = &curr;
+
 
         // Goal state found
         if (current->grid == goal_state) {
@@ -47,7 +53,7 @@ Node* general_search(std::vector< std::vector<int> > &problem, std::string queue
 
             // std::cout << "Open list: "  << open_list.size() << std::endl;
             // std::cout << "Closed list: "  << closed_list.size() << std::endl;
-            return current;
+            return *current;
         }
         // Update open/closed lists to reflect imminent expansion of the current grid configuration
         else {
@@ -81,7 +87,8 @@ Node* general_search(std::vector< std::vector<int> > &problem, std::string queue
  * Performs all expansion and enqueueing for the node currently being examined
  * Checks to see if the grid configuration has been seen before or is currently in queue; if so, does not add
  */
-void update_queue(Node* node, std::priority_queue<Node*> &queue, std::vector<Node*> &open_list, std::vector<Node*> &closed_list, std::string queueing_function) {
+//void update_queue(Node* node, std::priority_queue<Node*, std::vector<Node*>, std::greater<Node*>> &queue, std::vector<Node*> &open_list, std::vector<Node*> &closed_list, std::string queueing_function) {
+void update_queue(Node* node, std::priority_queue<Node> &queue, std::vector<Node*> &open_list, std::vector<Node*> &closed_list, std::string queueing_function) {
     int open_pos, closed_pos;
     std::vector<Node*> moves;
     Node* curr_node;
@@ -121,26 +128,29 @@ void update_queue(Node* node, std::priority_queue<Node*> &queue, std::vector<Nod
                             correct_val++;
                         }
                     }
-                    std::cout << "curr_node->heuristic = " << curr_node->heuristic << std::endl;
-                    std::cout << "moves.at(0)->heuristic = " << moves.at(0)->heuristic << std::endl;
+                    if (moves.at(0) != nullptr) {
+                        std::cout << "curr_node->heuristic = " << curr_node->heuristic << std::endl;
+                        std::cout << "moves.at(0)->heuristic = " << moves.at(0)->heuristic << std::endl;
 
-                    if (curr_node < moves.at(0)) {
-                        std::cout << "curr_node < moves.at(0)" << std::endl;
-                        print_grid(curr_node->grid);
-                        print_grid(moves.at(0)->grid);
-                    }
-                    else {
-                        std::cout << "curr_node > moves.at(0)" << std::endl;
-                        print_grid(curr_node->grid);
-                        print_grid(moves.at(0)->grid);
+                        if (*curr_node < *moves.at(0)) {
+                            std::cout << "curr_node < moves.at(0)" << std::endl;
+                            print_grid(curr_node->grid);
+                            print_grid(moves.at(0)->grid);
+                        }
+                        else {
+                            std::cout << "curr_node > moves.at(0)" << std::endl;
+                            print_grid(curr_node->grid);
+                            print_grid(moves.at(0)->grid);
+                        
+                        }
                     }
                 }
                 else { // Manhattan Distance
 
                 }
                 // Enqueue (will automatically adjust for heuristics)
-                queue.push(curr_node);
-
+                Node temp = *curr_node;
+                queue.push(temp);
                 open_list.push_back(curr_node);
             }
         }

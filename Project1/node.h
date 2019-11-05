@@ -3,28 +3,42 @@
 #define NODE_H
 
 #include <vector>
+struct compare;
 
-class Node {
-    public:
-        Node();
-        Node(std::vector<std::vector<int> > &grid_in);
+struct Node {
+    Node();
+    Node(std::vector<std::vector<int> > &grid_in);
 
-        int heuristic;
-        int depth;
+    int heuristic;
+    int depth;
 
-        void set_grid(std::vector<std::vector<int> > &grid_in);
-        bool operator==(const Node* rhs);
-        bool operator()(const Node& rhs);
-//        bool operator<(const Node* rhs);
-        std::vector<std::vector<int> > grid;
-        void set_depth(int d);
-};
-/*
-struct compare {
-    bool operator()(const Node& lhs, const Node& rhs) {
-        return lhs->heuristic < rhs->heuristic;
+    void set_grid(std::vector<std::vector<int> > &grid_in);
+
+    bool operator()(const Node& rhs) {
+        return heuristic > rhs.heuristic;
     }
+    friend bool operator<(const Node& lhs, const Node& rhs) {
+        return lhs.heuristic > rhs.heuristic;
+    }
+    //bool operator==(const Node& rhs); 
+    //bool operator()(const Node& rhs);
+    //bool operator>(const Node& rhs);
+//        bool operator<(const Node* rhs);
+    std::vector<std::vector<int> > grid;
+    
+    void set_depth(int d);
 };
+
+struct compare {
+/*    bool operator>(const Node*& lhs, const Node*& rhs) {
+        return lhs->heuristic > rhs->heuristic;
+    }
 */
+    /*
+    bool operator>(const Node& lhs, const Node& rhs) {
+        return lhs.heuristic < rhs.heuristic;
+    }
+    */
+};
 
 #endif //NODE_H

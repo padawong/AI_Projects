@@ -7,7 +7,7 @@
  * Location of 0 is passed in to avoid recalculating for each operation
  */
 
-class Node;
+struct Node;
 
 Node* move_right(Node* node, std::pair<int, int> coord) {
     if (coord.second == 2) {
