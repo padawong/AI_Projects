@@ -31,12 +31,12 @@ int main () {
     impossible.push_back({4, 5, 6});
     impossible.push_back({8, 7, 0});
 
-//    do {
-    std::cout << "Welcome to Erin Wong's 8-puzzle solver!" << std::endl;
+    std::cout << "Welcome to Erin Wong's 8-puzzle solver!\n" << std::endl;
 
     do {
         std::cout << "Type \"1\" to use a default puzzle, or \"2\" to enter your own puzzle." << std::endl;
         std::getline(std::cin, input);
+        std::cout << std::endl;
     } while (input != "1" && input != "2");
 
     // Default puzzle
@@ -79,7 +79,9 @@ int main () {
             std::vector<int> row;
             std::cout << "Enter the " << i << "th row. Use space or newline between numbers" << std::endl;
             for (int j = 0; j < 3 ; j++) {
-                std::getline(std::cin, nums_in);
+                std::cin >> nums_in;
+                std::cin.ignore();
+                //std::getline(std::cin, nums_in);
                 row.push_back(std::stoi(nums_in));
                 nums_in.clear();
             }
@@ -87,16 +89,20 @@ int main () {
         }
     }
 
-    std::cout << "The puzzle is as follows: " << std::endl;
+    // Output chosen/input puzzle
+    std::cout << "\nThe puzzle is as follows: " << std::endl;
     print_grid(grid);
+    std::cout << std::endl;
 
+    // Algorithm selection
     do {
         std::cout << "Enter your choice of algorithm: " << std::endl;
         std::cout << "1. Uniform Cost Search" << std::endl;
         std::cout << "2. A* with the Misplaced Tile heuristic" << std::endl;
-        std::cout << "3. A* with the Manhattan distance heuristic" << std::endl;
+        std::cout << "3. A* with the Manhattan Distance heuristic" << std::endl;
 
         std::getline(std::cin, input);
+        std::cout << std::endl;
     } while (input != "1" && input != "2" && input != "3");
 
     if (input == "1") {
@@ -108,13 +114,28 @@ int main () {
     else {
         queueing_function = "Manhattan Distance";
     }
+    std::cout << std::endl;
 
-    std::cout << "SOLVER BEGINNING. Expanding state: " << std::endl;
-    print_grid(grid);
 
-    //Node final_grid = general_search(grid, "Uniform Cost");
+    // Output final grid
     Node final_grid = general_search(grid, queueing_function);
+    std::cout << "\nFinal grid: " << std::endl;
     print_grid(final_grid.grid);
+
+    // Was hoping to implement output of parent nodes, but causing segfault when too many parents
+    /*
+    std::cout << "\nPlease enter '1' to see the parent nodes of the final grid or any other key to exit" << std::endl;
+    std::getline(std::cin, input);
+
+    if (input == "1") {
+        Node* grids_path = &final_grid;
+        while (grids_path->parent != nullptr) {
+            std::cout << "\nParent node of the above: " << std::endl;
+            print_grid(grids_path->parent->grid);
+            grids_path = grids_path->parent;
+        }
+    }
+    */
 
     return 0;
 }

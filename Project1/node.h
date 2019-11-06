@@ -3,18 +3,23 @@
 #define NODE_H
 
 #include <vector>
-struct compare;
 
 struct Node {
     Node();
+    ~Node();
     Node(std::vector<std::vector<int> > &grid_in);
+    //Node(Node* node_in);
 
+    //Node* parent;
+    //Node* child;
+    std::vector<std::vector<int> > grid;
     int dimension;
     int puzzle_size;
     int heuristic;
     int depth;
 
     void set_grid(std::vector<std::vector<int> > &grid_in);
+    void set_depth(int d);
 
     bool operator()(const Node& rhs) {
         return heuristic > rhs.heuristic;
@@ -22,25 +27,6 @@ struct Node {
     friend bool operator<(const Node& lhs, const Node& rhs) {
         return (lhs.depth + lhs.heuristic) > (rhs.depth + rhs.heuristic);
     }
-    //bool operator==(const Node& rhs); 
-    //bool operator()(const Node& rhs);
-    //bool operator>(const Node& rhs);
-//        bool operator<(const Node* rhs);
-    std::vector<std::vector<int> > grid;
-    
-    void set_depth(int d);
-};
-
-struct compare {
-/*    bool operator>(const Node*& lhs, const Node*& rhs) {
-        return lhs->heuristic > rhs->heuristic;
-    }
-*/
-    /*
-    bool operator>(const Node& lhs, const Node& rhs) {
-        return lhs.heuristic < rhs.heuristic;
-    }
-    */
 };
 
 #endif //NODE_H

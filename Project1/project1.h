@@ -19,10 +19,7 @@ Node general_search(std::vector< std::vector<int> > &problem, std::string queuei
 void const print_grid(std::vector< std::vector<int> > &grid);
 std::vector< std::vector<int> > generate_grid(int dimensions);
 std::pair<int, int> const find_zero(std::vector<std::vector<int> > &grid);
-//void update_queue(Node* node, std::priority_queue<Node*, std::vector<Node*>, std::greater<Node*>> &queue, std::vector<Node*> &open_list, std::vector<Node*> &closed_list, std::string queueing_function);
 void update_queue(Node* node, std::priority_queue<Node> &queue, std::vector<Node*> &open_list, std::vector<Node*> &closed_list, std::string queueing_function);
-//void update_misplaced_tile_queue(Node* node, std::priority_queue<Node*> &queue, std::vector<Node*> &open_list, std::vector<Node*> &closed_list);
-//void update_manhattan_distance_queue(Node* node, std::priority_queue<Node*> &queue, std::vector<Node*> &open_list, std::vector<Node*> &closed_list);
 int node_at(Node* node, std::vector<Node*> &list_in);
 
 #endif // PROJECT1_H

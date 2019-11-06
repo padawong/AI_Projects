@@ -1,7 +1,9 @@
+Heuristics: http://ai.stanford.edu/~latombe/cs121/2011/slides/D-heuristic-search.pdf
+
 Operator overloading: https://stackoverflow.com/questions/1691007/whats-the-right-way-to-overload-operator-for-a-class-hierarchy
     https://stackoverflow.com/questions/32685139/bool-must-take-exactly-one-argument-operator-implementation-file
 
-Referenced this site for expected generation values/depth/etc. of input: http://tristanpenman.com/demos/n-puzzle/
+Referenced this site for open/closed list concept and expected generation values/depth/etc. of input: http://tristanpenman.com/demos/n-puzzle/
 
 Priority queue - overloading operator: https://stackoverflow.com/questions/9178083/priority-queue-for-user-defined-types/19123561
     https://stackoverflow.com/questions/9178083/priority-queue-for-user-defined-types/19123561
