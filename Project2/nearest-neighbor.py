@@ -80,6 +80,7 @@ def leave_one_out_cross_validation(data, current_features, feature_to_add):
 
     # Iterate through all cat_2 samples in terms of the specified features
     # Compare to each other sample in order to determine predicted class
+    curr_best = -1
     i = 0
     while i < len(cat_2[0]):
 
