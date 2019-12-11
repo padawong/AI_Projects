@@ -13,50 +13,121 @@ random.seed()
     In this function, the data is passed in as two dictionaries whose key is the feature number and value is the list of feature values for all samples
     feature_to_add is the feature number that we are currently considering
 """
-# For each 
-# For each sample of data, 
+# For each of the current features and feature to add, find accuracy
+#     by comparing testing accuracy of sample of data with those features
+# for number of features being tested
+#     for every sample (index 0 to num of samples)
 def leave_one_out_cross_validation(data, current_features, feature_to_add):
     cat_1 = data[0]
     cat_2 = data[1]
+    # print('current_features = ' + str(current_features) + '; feature_to_add = ' + str(feature_to_add))
 
     num_features = len(cat_1)
-    num_samples = len(cat_1[0])
-
-    distance = 0
-    best_match = ""
-    # Find distance using current_features and feature_to_add
-    for feature_num in current_features:
-        inner_diff = 0
-        for samples in feature_num:
-            print('cat_1[feature_num][samples] = ' + cat_1[feature_num][samples])
-            inner_diff -= cat_1[feature_num][samples]
-        distance += inner_diff**2
-
+    distance = 0.0
+    curr_best = -1
+    best_cat = 0
+    num_correct = 0
+    
+    # Iterate through all cat_1 samples in terms of the specified features
+    # Compare to each other sample in order to determine predicted class
     i = 0
-    for i < num_samples:
-        best_match = ""
-        curr_best = -1
-        curr_best_index = -1
-        j = 0
-        for j < num_samples:
-            if i != j:
-                n = 0
-                sum_squares = 0
-                for n <= feature_to_add:
-                    sum_squares += (cat_1[i][n] - cat_2[j][n])**2
-                    print('cat_1[i][n] = ' + cat_1[i][n]) 
-                    print('cat_2[i][n] = ' + cat_2[i][n]) 
-                    n += 1
-                distance = sqrt(sum_squares)
-                print('distance = ' + distance)
-                if distance < curr_best:
-                    curr_best = distance
-                    curr_best_index = j
-            j += 1
-        if 
-        i += 1
+    while i < len(cat_1[0]):
 
-    return 
+        # Compare with all other samples in cat_1
+        j = 0
+        while j < len(cat_1[0]):
+            if i != j:
+                # print('i = ' + str(i) + '; j = ' + str(j))
+                # Calculate (potentially multidimensional) Euclidean Distance
+                # TODO: Figure out if should use a different distance metric
+                inner_diff = 0.0
+                distance = 0.0
+                for feature in current_features:
+                    #print('i = ' + str(i) + '; j = ' + str(j) + 'feature = ' + str(feature) + '; current_features = ' + str(current_features) + '; cat_1[feature - 1][i] = ' + str(cat_1[feature - 1][i]) + '; cat_1[feature - 1][j] = ' + str(cat_1[feature - 1][j]))
+                    inner_diff = cat_1[feature - 1][i] - cat_1[feature - 1][j]
+                    distance += inner_diff**2
+                inner_diff = cat_1[feature_to_add][i] - cat_1[feature_to_add][j]
+                distance += inner_diff**2
+                distance = math.sqrt(distance)
+                #print('distance = ' + str(distance))
+
+                if curr_best < 0 or distance < curr_best:
+                    curr_best = distance
+                    best_cat = 1
+            j += 1
+
+        # Compare with all samples in cat_2
+        j = 0
+        while j < len(cat_2[0]):
+            inner_diff = 0
+            distance = 0.0
+            for feature in current_features:
+                inner_diff = cat_1[feature - 1][i] - cat_2[feature - 1][j]
+                distance += inner_diff**2
+            inner_diff = cat_1[feature_to_add][i] - cat_2[feature_to_add][j]
+            distance += inner_diff**2
+            distance = math.sqrt(distance)
+
+            if curr_best < 0 or distance < curr_best:
+                curr_best = distance
+                best_cat = 2
+            j += 1
+        i += 1 
+
+        # Matched correct category
+        if best_cat == 1:
+            num_correct += 1
+
+    # Iterate through all cat_2 samples in terms of the specified features
+    # Compare to each other sample in order to determine predicted class
+    i = 0
+    while i < len(cat_2[0]):
+
+        # Compare with all other samples in cat_2
+        j = 0
+        while j < len(cat_2[0]):
+            if i != j:
+                distance = 0.0
+                inner_diff = 0.0
+                for feature in current_features:
+                    inner_diff = cat_2[feature - 1][i] - cat_2[feature - 1][j]
+                    distance += inner_diff**2
+                inner_diff = cat_2[feature_to_add][i] - cat_2[feature_to_add][j]
+                distance += inner_diff**2
+                distance = math.sqrt(distance)
+
+                if curr_best < 0 or distance < curr_best:
+                    curr_best = distance
+                    best_cat = 2
+            j += 1
+
+        # Compare with all samples in cat_1
+        j = 0
+        while j < len(cat_1[0]):
+            distance = 0.0
+            inner_diff = 0.0
+            for feature in current_features:
+                inner_diff = cat_2[feature - 1][i] - cat_1[feature - 1][j]
+                distance += inner_diff**2
+            inner_diff = cat_2[feature_to_add][i] - cat_1[feature_to_add][j]
+            distance += inner_diff**2
+            distance = math.sqrt(distance)
+
+            if curr_best < 0 or distance < curr_best:
+                curr_best = distance
+                best_cat = 1
+            j += 1
+        i += 1 
+
+        # Matched correct category
+        if best_cat == 2:
+            num_correct += 1
+
+    print('num correct = ' + str(num_correct))
+    print('len(cat_1[0]) = ' + str(len(cat_1[0])) + '\tlen(cat_2[0])) = ' + str(len(cat_2[0])))
+    accuracy = num_correct / (len(cat_1[0]) + len(cat_2[0]))
+    print('accuracy = ' + str(accuracy))
+    return accuracy
 
 file_in = open("CS170_SMALLtestdata__119.txt", 'r')
 
@@ -120,10 +191,17 @@ for featurelist in cat_1_norm:
 
 """
 
+current_features = [3, 4]
+data = [cat_1_norm, cat_2_norm]
+acc = leave_one_out_cross_validation(data, current_features, 1)
+print('\n\n\nacc = ' + str(acc))
+
+"""
+
 ### FORWARD SEARCH FUNCTION
 # Number of features in this dataset is equal to the num of keys in the dictionary
 num_features = len(cat_1_norm)
-level_accuracy = {} # A dictionary of len(num_features) whose keys are the lists of the highest accuracy at each level and values are the accuracy
+#level_accuracy = {} # A dictionary of len(num_features) whose keys are the lists of the highest accuracy at each level and values are the accuracy
 current_features = []
 i = 0
 data = [cat_1_norm, cat_2_norm]
@@ -141,7 +219,6 @@ while i < num_features:
     while j < num_features:
         if j + 1 not in current_features:
             print('\t- Considering adding feature ' + str(j + 1))
-            # TODO: Implement the stub for this
             accuracy = leave_one_out_cross_validation(data, current_features, j)
             print('\t\t* Accuracy = ' + str(accuracy))
 
@@ -155,11 +232,12 @@ while i < num_features:
         print('\t+ On level ' + str(i + 1) + ', feature ' + str(add_feature + 1) + ' added to current set')
         print('\tCurrent set: ' + str(current_features))
     
-    level_accuracy[tuple(current_features)] = curr_best_acc
+    #level_accuracy[tuple(current_features)] = curr_best_acc
     i += 1
 
 print('\n level_accuracy: ' + str(level_accuracy))
 ###
+"""
 
 """
 
