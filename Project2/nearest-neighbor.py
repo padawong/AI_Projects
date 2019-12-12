@@ -33,105 +33,151 @@ def leave_one_out_cross_validation(dataset, current_features, feature_to_add):
     accuracy = num_correct / len(dataset)
     return accuracy
 
+# Pass data from file into list of lists in original positions
+# Generate lists of features to perform normalization
+def parse_file(file_loc):
+    file_in = open(file_loc, 'r')
 
-file_in = open("data.txt", 'r')
+    # Parse all data to perform normalization
+    # For normalizing, all values of all features are stored into a dictionary
+    features_raw = defaultdict(list)
 
-# For normalizing, all values of all features are stored into a dictionary
-features_raw = defaultdict(list)
-
-# All data is stored in original positions in a 2D list
-dataset = []
-
-# Parse all data to perform normalization
-category = -1
-feature_num = 0
-for line in file_in:
-    dataline = []
-    for number in line.split():
-        # Parse features into a 2D matrix that holds all data in the same positions as the original file
-        dataline.append(float(number))
-        feature_values = []
-
-        # First number in the line specifies the category; set category
-        if category == -1:
-            category = float(number)
-
-        else:
-            features_raw[feature_num].append(float(number))
-            feature_num += 1
-        # Current value is appended to the corresponding feature list
-
+    # All data is stored in original positions in a 2D list
+    dataset = []
     category = -1
     feature_num = 0
-    dataset.append(dataline)
+    for line in file_in:
+        dataline = []
+        for number in line.split():
+            # Parse features into a 2D matrix that holds all data in the same positions as the original file
+            dataline.append(float(number))
+            feature_values = []
+
+            # First number in the line specifies the category; set category
+            if category == -1:
+                category = float(number)
+
+            else:
+                features_raw[feature_num].append(float(number))
+                feature_num += 1
+            # Current value is appended to the corresponding feature list
+
+        category = -1
+        feature_num = 0
+        dataset.append(dataline)
+    return dataset, features_raw
 
 
 # Normalize all data in the dataset by referring to the appropriate category
-for line in dataset:
-    n = 0
-    for number in line:
-        if n == 0:
+def normalize(dataset, features_raw):
+    for line in dataset:
+        n = 0
+        for number in line:
+            if n == 0:
+                n += 1
+                continue
+
+            minimum = min(features_raw[n-1])
+            maximum = max(features_raw[n-1])
+            line[n] = (number - minimum) / (maximum - minimum)
             n += 1
-            continue
+    return dataset, len(features_raw)
 
-        """
-        if line[0] == 1:
-            print('min(cat_1_raw[' + str(n-1) + ']) = ' + str(min(cat_1_raw[n-1])))
-            print('max(cat_1_raw[' + str(n-1) + ']) = ' + str(max(cat_1_raw[n-1])))
-            print('cat_1_raw[' + str(n-1) + '] = ' + str(cat_1_raw[n-1]))
-            minimum = min(cat_1_raw[n-1])
-            maximum = max(cat_1_raw[n-1])
-        elif line[0] == 2:
-            print('min(cat_2_raw[' + str(n-1) + ']) = ' + str(min(cat_2_raw[n-1])))
-            print('max(cat_2_raw[' + str(n-1) + ']) = ' + str(max(cat_2_raw[n-1])))
-            print('cat_2_raw[' + str(n-1) + '] = ' + str(cat_2_raw[n-1]))
-            minimum = min(cat_2_raw[n-1])
-            maximum = max(cat_2_raw[n-1])
 
-        print('line[' + str(n) + '] = ' + str(line[n]))
-        print('number = ' + str(number))
-        """
-        minimum = min(features_raw[n-1])
-        maximum = max(features_raw[n-1])
-        line[n] = (number - minimum) / (maximum - minimum)
-        n += 1
+# FORWARD SEARCH FUNCTION
+def forward_search(dataset, num_features):
+    # A dictionary of len(num_features) whose keys are the lists of the highest accuracy at each level and values are the accuracy
+    level_accuracy = {} 
+    current_features = []
+    best_accuracy = 0
+    best_set = []
 
-### FORWARD SEARCH FUNCTION
-# Number of features in this dataset is equal to the num of keys in the dictionary
-num_features = len(features_raw)
-level_accuracy = {} # A dictionary of len(num_features) whose keys are the lists of the highest accuracy at each level and values are the accuracy
-current_features = []
-i = 0
-# Starting with a set of one feature, test each set of features for highest accuracy
-# Outer loop is to traverse each level of the tree
-while i < num_features:
-    print('\nOn level ' + str(i + 1) + ' of the search tree:')
-    # Feature to add at this level
-    add_feature = -1
-    # Best accuracy so far
-    curr_best_acc = 0
+    i = 0
+    # Starting with a set of one feature, test each set of features for highest accuracy
+    # Outer loop is to traverse each level of the tree
+    while i < num_features:
+        print('\nOn level ' + str(i + 1) + ' of the search tree:')
+        # Feature to add at this level
+        add_feature = -1
+        # Best accuracy so far
+        curr_best_acc = 0
 
-    j = 0
-    # Inner loop is to determine best feature to add on each level
-    while j < num_features:
-        if j + 1 not in current_features:
-            print('\t- Considering adding feature ' + str(j + 1))
-            accuracy = leave_one_out_cross_validation(dataset, current_features, j + 1)
-            print('\t\t* Accuracy = ' + str(accuracy))
+        j = 0
+        # Inner loop is to determine best feature to add on each level
+        while j < num_features:
+            if j + 1 not in current_features:
+                print('\t- Considering adding feature ' + str(j + 1))
+                accuracy = leave_one_out_cross_validation(dataset, current_features, j + 1)
+                print('\t\t* Accuracy = {:.1%}'.format(accuracy))
 
-            if accuracy > curr_best_acc:
-                curr_best_acc = accuracy
-                print('\t\t* curr_best_acc = ' + str(curr_best_acc))
-                add_feature = j
-        j += 1
-    if add_feature > -1:
-        current_features.append(add_feature + 1)
-        print('\t+ On level ' + str(i + 1) + ', feature ' + str(add_feature + 1) + ' added to current set')
-        print('\tCurrent set: ' + str(current_features))
-    
-    level_accuracy[tuple(current_features)] = curr_best_acc
-    i += 1
+                if accuracy > curr_best_acc:
+                    curr_best_acc = accuracy
+                    add_feature = j
+            j += 1
+        
+        if curr_best_acc < best_accuracy:
+            print('\n*** WARNING: accuracy has decreased. Continuing search in case of local maxima ***\n')
 
-print('\n level_accuracy: ' + str(level_accuracy))
-###
+        if add_feature > -1:
+            current_features.append(add_feature + 1)
+            print('\t+ On level ' + str(i + 1) + ', feature ' + str(add_feature + 1) + ' added to current set')
+            print('\tCurrent set: ' + str(current_features))
+        
+        if curr_best_acc > best_accuracy:
+            best_accuracy = curr_best_acc
+            best_set = current_features.copy()
+            
+        level_accuracy[tuple(current_features)] = curr_best_acc
+        i += 1
 
+    return best_accuracy, best_set
+
+print('Welcome to Erin Wong\'s Feature Selection Algorithm!\n')
+print('Please choose a file to test: ')
+print('1) Small data set')
+print('2) Large data set')
+print('3) Enter file path')
+sel = input()
+while sel != '1' and sel != '2' and sel != '3':
+    print('Please make a valid selection:')
+    sel = input()
+
+file_loc = ''
+if sel == '1':
+    file_loc = 'CS170_SMALLtestdata__35.txt'
+elif sel == '2':
+    file_loc = 'CS170_LARGEtestdata__37.txt'
+else:
+    print('Please type in the name of the file to test: ')
+    file_loc = input()
+
+print('\nType the number of the algorithm you wish to run:')
+print('1) Forward Selection')
+print('2) Backward Elimination')
+print('3) Erin\'s Special Algorithm\n')
+sel = input()
+while sel != '1' and sel != '2' and sel != '3':
+    print('Please make a valid selection:')
+    sel = input()
+
+dataset, features_raw = parse_file(file_loc)
+print('\nThe dataset has ' + str(len(features_raw)) + ' features (not including the class attribute), with ' + str(len(dataset)) + ' instances.')
+print('Please wait while data is normalized...')
+dataset, num_features = normalize(dataset, features_raw)
+print('\tDone!')
+
+# Forward Selection
+if sel == '1':
+    print('Beginning forward selection:')
+    best_accuracy, best_set = forward_search(dataset, num_features)
+
+# Backward Elimination
+elif sel == '2':
+    print('Beginning backward elimination:')
+    #backward_search(dataset, num_features)
+
+else:
+    print('Beginning Erin\'s Special Algorithm:')
+    #secret_sauce(dataset, num_features)
+
+print('\n\nFinished search! For ' + file_loc + ' the best feature subset is ' + str(best_set) + ' with accuracy {:.1%}'.format(best_accuracy))
