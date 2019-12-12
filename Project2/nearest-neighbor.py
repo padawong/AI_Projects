@@ -19,6 +19,39 @@ random.seed()
 #     for every sample (index 0 to num of samples)
 def leave_one_out_cross_validation(dataset, current_features, feature_to_add):
     # print('current_features = ' + str(current_features) + '; feature_to_add = ' + str(feature_to_add))
+    
+    num_correct = 0
+
+    sample_line = 0
+    for sample in dataset:
+        curr_best = -1
+        curr_best_line = -1
+
+        compare_line = 0
+        for compare in dataset:
+            if sample != compare:
+                distance = 0.0
+                for feature in current_features:
+                    distance += (sample[feature] - compare[feature])**2
+                distance += (sample[feature_to_add] - compare[feature_to_add])**2
+                distance = math.sqrt(distance)
+                    
+                if curr_best < 0 or distance < curr_best:
+                    curr_best = distance
+                    curr_best_line = compare_line
+
+            compare_line += 1
+        if dataset[sample_line][0] == dataset[curr_best_line][0]:
+            num_correct += 1
+        sample_line += 1
+
+    accuracy = num_correct / len(dataset)
+    return accuracy
+
+"""
+
+
+
 
     num_features = len(cat_1)
     distance = 0.0
@@ -140,6 +173,7 @@ def leave_one_out_cross_validation(dataset, current_features, feature_to_add):
     accuracy = num_correct / (len(cat_1[0]) + len(cat_2[0]))
     print('\t\taccuracy = ' + str(accuracy))
     return accuracy
+"""
 
 file_in = open("data.txt", 'r')
 
@@ -186,7 +220,6 @@ n = 0
 for line in dataset:
     print(str(n) + ': ' + str(line))
     n += 1
-"""
 
 # Normalize all data in the dataset by referring to the appropriate category
 for line in dataset:
@@ -217,7 +250,6 @@ for line in dataset:
         line[n] = (number - mean) / std_dev
         n += 1
 
-"""
 print('Normalized Dataset: ')
 n = 0
 for line in dataset:
@@ -265,7 +297,7 @@ while i < num_features:
     while j < num_features:
         if j + 1 not in current_features:
             print('\t- Considering adding feature ' + str(j + 1))
-            accuracy = leave_one_out_cross_validation(dataset, current_features, j)
+            accuracy = leave_one_out_cross_validation(dataset, current_features, j + 1)
             print('\t\t* Accuracy = ' + str(accuracy))
 
             if accuracy > curr_best_acc:
@@ -283,6 +315,7 @@ while i < num_features:
 
 print('\n level_accuracy: ' + str(level_accuracy))
 ###
+"""
 
 
 # test_data is the left-out-one instance of data
