@@ -3,9 +3,13 @@ import math
 
 # For each of the current features and feature to add, find accuracy
 #     by comparing testing accuracy of sample of data with those features
-def leave_one_out_cross_validation(dataset, current_features, feature_to_add):
+def leave_one_out_cross_validation(dataset, current_features, feature_to_consider, algorithm):
     num_correct = 0
     sample_line = 0
+
+    temp_features = current_features.copy()
+    if algorithm == 'backward':
+        temp_features.remove(feature_to_consider)
 
     # Compare each sample in the dataset with every other sample based on the current feature(s)
     for sample in dataset:
@@ -16,9 +20,13 @@ def leave_one_out_cross_validation(dataset, current_features, feature_to_add):
         for compare in dataset:
             if sample != compare:
                 distance = 0.0
-                for feature in current_features:
+
+                for feature in temp_features:
                     distance += (sample[feature] - compare[feature])**2
-                distance += (sample[feature_to_add] - compare[feature_to_add])**2
+
+                if algorithm == 'forward':
+                    distance += (sample[feature_to_consider] - compare[feature_to_consider])**2
+
                 distance = math.sqrt(distance)
                     
                 if curr_best < 0 or distance < curr_best:
@@ -86,7 +94,6 @@ def normalize(dataset, features_raw):
 
 # FORWARD SEARCH FUNCTION
 def forward_search(dataset, num_features):
-    # A dictionary of len(num_features) whose keys are the lists of the highest accuracy at each level and values are the accuracy
     level_accuracy = {} 
     current_features = []
     best_accuracy = 0
@@ -107,21 +114,23 @@ def forward_search(dataset, num_features):
         while j < num_features:
             if j + 1 not in current_features:
                 print('\t- Considering adding feature ' + str(j + 1))
-                accuracy = leave_one_out_cross_validation(dataset, current_features, j + 1)
-                print('\t\t* Accuracy = {:.1%}'.format(accuracy))
+                accuracy = leave_one_out_cross_validation(dataset, current_features, j + 1, 'forward')
+                temp_features = current_features.copy()
+                temp_features.append(j+1)
+                print('\t\t* Accuracy for ' + str(temp_features) + ' = {:.1%}'.format(accuracy))
 
                 if accuracy > curr_best_acc:
                     curr_best_acc = accuracy
                     add_feature = j
             j += 1
         
-        if curr_best_acc < best_accuracy:
-            print('\n*** WARNING: accuracy has decreased. Continuing search in case of local maxima ***\n')
-
         if add_feature > -1:
             current_features.append(add_feature + 1)
             print('\t+ On level ' + str(i + 1) + ', feature ' + str(add_feature + 1) + ' added to current set')
             print('\tCurrent set: ' + str(current_features))
+
+        if curr_best_acc < best_accuracy and i != num_features - 1:
+            print('\n*** WARNING: accuracy has decreased. Continuing search in case of local maxima ***')
         
         if curr_best_acc > best_accuracy:
             best_accuracy = curr_best_acc
@@ -131,6 +140,116 @@ def forward_search(dataset, num_features):
         i += 1
 
     return best_accuracy, best_set
+
+
+# BACKWARD SEARCH FUNCTION
+def backward_search(dataset, num_features):
+    level_accuracy = {} 
+    current_features = list(range(1, num_features + 1))
+    best_accuracy = 0
+    worst_set = []
+
+    i = num_features
+    # Starting with a set of all features, test each subset for highest accuracy
+    # Outer loop is to traverse each level of the tree
+
+    accuracy = leave_one_out_cross_validation(dataset, current_features, 0, 'initial')
+    print('\nAccuracy for initial set ' + str(current_features) + ' = {:.1%}'.format(accuracy))
+
+    while i > 1:
+        print('\nOn level ' + str(i) + ' of the search tree:')
+        # Feature to remove at this level
+        remove_feature = -1
+
+        curr_worst_acc = 1
+
+        # Inner loop is to determine best feature to remove on each level
+        for feature in current_features:
+            print('\t- Considering removing feature ' + str(feature))
+            accuracy = leave_one_out_cross_validation(dataset, current_features, feature, 'backward')
+            temp_features = current_features.copy()
+            temp_features.remove(feature)
+            print('\t\t* Accuracy for ' + str(temp_features) + ' = {:.1%}'.format(accuracy))
+
+            if accuracy < curr_worst_acc:
+                curr_worst_acc = accuracy
+                remove_feature = feature
+            if accuracy > best_accuracy:
+                best_accuracy = accuracy
+                best_set = current_features.copy()
+                best_set.remove(feature)
+        
+        if remove_feature > -1:
+            current_features.remove(remove_feature)
+            print('\t+ On level ' + str(i) + ', feature ' + str(remove_feature) + ' removed from current set')
+            print('\tCurrent set: ' + str(current_features))
+           
+        level_accuracy[tuple(current_features)] = curr_worst_acc
+        i -= 1
+
+    return best_accuracy, best_set
+
+
+# Following the method discussed during lecture:
+#   Keep track of the lowest number of incorrect matches during leave_one_out
+#   If a feature has a higher number of incorrect matches, immediately stop and remove it
+def secret_sauce(dataset, num_features):
+    level_accuracy = {} 
+    current_features = list(range(1, num_features + 1))
+    best_accuracy = 0
+    worst_set = []
+
+    i = num_features
+    # Starting with a set of all features, test each subset for highest accuracy
+    # Outer loop is to traverse each level of the tree
+
+    accuracy = leave_one_out_cross_validation(dataset, current_features, 0, 'initial')
+    print('\nAccuracy for initial set ' + str(current_features) + ' = {:.1%}'.format(accuracy))
+
+    while i > 1:
+        print('\nOn level ' + str(i) + ' of the search tree:')
+        # Feature to remove at this level
+        remove_feature = -1
+
+        curr_worst_acc = 1
+
+        # Inner loop is to determine best feature to remove on each level
+        for feature in current_features:
+            print('\t- Considering removing feature ' + str(feature))
+            accuracy = leave_one_out_cross_validation(dataset, current_features, feature, 'backward')
+            temp_features = current_features.copy()
+            temp_features.remove(feature)
+            print('\t\t* Accuracy for ' + str(temp_features) + ' = {:.1%}'.format(accuracy))
+
+            if accuracy < curr_worst_acc:
+                curr_worst_acc = accuracy
+                remove_feature = feature
+            if accuracy > best_accuracy:
+                best_accuracy = accuracy
+                best_set = current_features.copy()
+                best_set.remove(feature)
+        
+        if remove_feature > -1:
+            current_features.remove(remove_feature)
+            print('\t+ On level ' + str(i) + ', feature ' + str(remove_feature) + ' removed from current set')
+            print('\tCurrent set: ' + str(current_features))
+
+        """
+        if curr_worst_acc < worst_accuracy and i != 1:
+            print('\n*** WARNING: accuracy has decreased. Continuing search in case of local maxima ***')
+        
+        if curr_worst_acc < worst_accuracy:
+            worst_accuracy = curr_worst_acc
+            worst_set = current_features.copy()
+        if curr_best_acc > best_accuracy:
+            best_accuracy = curr_best_acc
+        """
+            
+        level_accuracy[tuple(current_features)] = curr_worst_acc
+        i -= 1
+
+    return best_accuracy, best_set
+
 
 print('Welcome to Erin Wong\'s Feature Selection Algorithm!\n')
 print('Please choose a file to test: ')
@@ -166,6 +285,8 @@ print('Please wait while data is normalized...')
 dataset, num_features = normalize(dataset, features_raw)
 print('\tDone!')
 
+best_accuracy = 0.0
+best_set = []
 # Forward Selection
 if sel == '1':
     print('Beginning forward selection:')
@@ -174,7 +295,7 @@ if sel == '1':
 # Backward Elimination
 elif sel == '2':
     print('Beginning backward elimination:')
-    #backward_search(dataset, num_features)
+    best_accuracy, best_set = backward_search(dataset, num_features)
 
 else:
     print('Beginning Erin\'s Special Algorithm:')
