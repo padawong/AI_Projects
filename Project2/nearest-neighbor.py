@@ -198,7 +198,7 @@ def backward_search(dataset, num_features):
         if remove_feature > -1:
             current_features.remove(remove_feature)
             print('\t+ On level ' + str(i) + ', feature ' + str(remove_feature) + ' removed from current set')
-            print('\tCurrent set: ' + str(current_features))
+            print('\tCurrent set: ' + str(current_features) + ' -- {:.1%}'.format(curr_best_acc))
 
         if curr_best_acc > best_accuracy:
             best_accuracy = curr_best_acc
@@ -261,7 +261,7 @@ def secret_sauce(dataset, num_features):
         if add_feature > -1:
             current_features.append(add_feature + 1)
             print('\t+ On level ' + str(i + 1) + ', feature ' + str(add_feature + 1) + ' added to current set')
-            print('\tCurrent set: ' + str(current_features))
+            print('\tCurrent set: ' + str(current_features) + ' -- {:.1%}'.format(curr_best_acc))
 
         if curr_best_acc < best_accuracy and i != num_features - 1:
             print('\n*** WARNING: accuracy has decreased. Continuing search in case of local maxima ***')
