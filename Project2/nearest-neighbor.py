@@ -164,7 +164,7 @@ def backward_search(dataset, num_features):
     level_accuracy = {} 
     current_features = list(range(1, num_features + 1))
     best_accuracy = 0
-    worst_set = []
+    best_set = []
 
     i = num_features
     # Starting with a set of all features, test each subset for highest accuracy
@@ -179,7 +179,7 @@ def backward_search(dataset, num_features):
         # Feature to remove at this level
         remove_feature = -1
 
-        curr_worst_acc = 1
+        curr_best_acc = -1
 
         # Inner loop is to determine best feature to remove on each level
         for feature in current_features:
@@ -191,20 +191,20 @@ def backward_search(dataset, num_features):
             if num_features < 100:
                 print('\t\t* Accuracy for ' + str(temp_features) + ' = {:.1%}'.format(accuracy))
 
-            if accuracy < curr_worst_acc:
-                curr_worst_acc = accuracy
+            if accuracy > curr_best_acc:
+                curr_best_acc = accuracy
                 remove_feature = feature
-            if accuracy > best_accuracy:
-                best_accuracy = accuracy
-                best_set = current_features.copy()
-                best_set.remove(feature)
         
         if remove_feature > -1:
             current_features.remove(remove_feature)
             print('\t+ On level ' + str(i) + ', feature ' + str(remove_feature) + ' removed from current set')
             print('\tCurrent set: ' + str(current_features))
+
+        if curr_best_acc > best_accuracy:
+            best_accuracy = curr_best_acc
+            best_set = current_features.copy()
            
-        level_accuracy[tuple(current_features)] = curr_worst_acc
+        level_accuracy[tuple(current_features)] = curr_best_acc
         i -= 1
 
     return best_accuracy, best_set
