@@ -1,5 +1,6 @@
 from collections import defaultdict
 import math
+import time
 
 # For each of the current features and feature to add, find accuracy
 #     by comparing testing accuracy of sample of data with those features
@@ -116,7 +117,8 @@ def forward_search(dataset, num_features):
     # Starting with a set of one feature, test each set of features for highest accuracy
     # Outer loop is to traverse each level of the tree
     while i < num_features:
-        print('\nOn level ' + str(i + 1) + ' of the search tree:')
+        if num_features < 100:
+            print('\nOn level ' + str(i + 1) + ' of the search tree:')
         # Feature to add at this level
         add_feature = -1
         # Best accuracy so far
@@ -126,11 +128,13 @@ def forward_search(dataset, num_features):
         # Inner loop is to determine best feature to add on each level
         while j < num_features:
             if j + 1 not in current_features:
-                print('\t- Considering adding feature ' + str(j + 1))
+                if num_features < 100:
+                    print('\t- Considering adding feature ' + str(j + 1))
                 accuracy, null = leave_one_out_cross_validation(dataset, current_features, j + 1, 'forward')
                 temp_features = current_features.copy()
                 temp_features.append(j+1)
-                print('\t\t* Accuracy for ' + str(temp_features) + ' = {:.1%}'.format(accuracy))
+                if num_features < 100:
+                    print('\t\t* Accuracy for ' + str(temp_features) + ' = {:.1%}'.format(accuracy))
 
                 if accuracy > curr_best_acc:
                     curr_best_acc = accuracy
@@ -140,7 +144,7 @@ def forward_search(dataset, num_features):
         if add_feature > -1:
             current_features.append(add_feature + 1)
             print('\t+ On level ' + str(i + 1) + ', feature ' + str(add_feature + 1) + ' added to current set')
-            print('\tCurrent set: ' + str(current_features))
+            print('\tCurrent set: ' + str(current_features) + ' -- {:.1%}'.format(curr_best_acc))
 
         if curr_best_acc < best_accuracy and i != num_features - 1:
             print('\n*** WARNING: accuracy has decreased. Continuing search in case of local maxima ***')
@@ -166,11 +170,12 @@ def backward_search(dataset, num_features):
     # Starting with a set of all features, test each subset for highest accuracy
     # Outer loop is to traverse each level of the tree
 
-    accuracy = leave_one_out_cross_validation(dataset, current_features, 0, 'initial')
+    accuracy, null = leave_one_out_cross_validation(dataset, current_features, 0, 'initial')
     print('\nAccuracy for initial set ' + str(current_features) + ' = {:.1%}'.format(accuracy))
 
     while i > 1:
-        print('\nOn level ' + str(i) + ' of the search tree:')
+        if num_features < 100:
+            print('\nOn level ' + str(i) + ' of the search tree:')
         # Feature to remove at this level
         remove_feature = -1
 
@@ -178,11 +183,13 @@ def backward_search(dataset, num_features):
 
         # Inner loop is to determine best feature to remove on each level
         for feature in current_features:
-            print('\t- Considering removing feature ' + str(feature))
+            if num_features < 100:
+                print('\t- Considering removing feature ' + str(feature))
             accuracy, null = leave_one_out_cross_validation(dataset, current_features, feature, 'backward')
             temp_features = current_features.copy()
             temp_features.remove(feature)
-            print('\t\t* Accuracy for ' + str(temp_features) + ' = {:.1%}'.format(accuracy))
+            if num_features < 100:
+                print('\t\t* Accuracy for ' + str(temp_features) + ' = {:.1%}'.format(accuracy))
 
             if accuracy < curr_worst_acc:
                 curr_worst_acc = accuracy
@@ -269,7 +276,6 @@ def secret_sauce(dataset, num_features):
     return best_accuracy, best_set
 
 
-
 print('Welcome to Erin Wong\'s Feature Selection Algorithm!\n')
 print('Please choose a file to test: ')
 print('1) Small data set')
@@ -292,7 +298,7 @@ else:
 print('\nType the number of the algorithm you wish to run:')
 print('1) Forward Selection')
 print('2) Backward Elimination')
-print('3) Erin\'s Special Algorithm\n')
+print('3) Erin\'s Special Algorithm')
 sel = input()
 while sel != '1' and sel != '2' and sel != '3':
     print('Please make a valid selection:')
@@ -303,21 +309,29 @@ print('\nThe dataset has ' + str(len(features_raw)) + ' features (not including 
 print('Please wait while data is normalized...')
 dataset, num_features = normalize(dataset, features_raw)
 print('\tDone!')
+print('\n*** PLEASE NOTE: Large number of features detected. Most print statements will be suppressed')
 
 best_accuracy = 0.0
 best_set = []
+
+start_time = time.time()
+
 # Forward Selection
 if sel == '1':
-    print('Beginning forward selection:')
+    print('\nBeginning forward selection:')
     best_accuracy, best_set = forward_search(dataset, num_features)
+    algorithm = 'Forward Selection'
 
 # Backward Elimination
 elif sel == '2':
-    print('Beginning backward elimination:')
+    print('\nBeginning backward elimination:')
     best_accuracy, best_set = backward_search(dataset, num_features)
+    algorithm = 'Backward Elimination'
 
 else:
-    print('Beginning Erin\'s Special Algorithm:')
+    print('\nBeginning Erin\'s Special Algorithm:')
     best_accuracy, best_set = secret_sauce(dataset, num_features)
+    algorithm = 'Erin\'s Special Algorithm'
 
-print('\n\nFinished search! For ' + file_loc + ' the best feature subset is ' + str(best_set) + ' with accuracy {:.1%}'.format(best_accuracy))
+print('\nFinished ' + algorithm + '! For ' + file_loc + ' the best feature subset is ' + str(best_set) + ' with accuracy {:.1%}'.format(best_accuracy))
+print('\nTime to run algorithm: %s seconds' % (time.time() - start_time)) 
